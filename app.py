@@ -1,4 +1,4 @@
-from flask import Flask, render_template
+from flask import Flask, render_template, request, redirect, url_for
 from data_manager import DataManager
 from models import db, Movie
 import os
@@ -14,9 +14,23 @@ db.init_app(app)  # Link the database and the app. This is the reason you need t
 data_manager = DataManager() # Create an object of your DataManager class
 
 
-@app.route('/', methods=['GET'])
-def home():
-    return "Welcome to MoviWeb App!"
+@app.route('/')
+def index():
+    users = data_manager.get_users()
+    return render_template('index.html', users=users)
+
+
+@app.route('/users', methods=['POST'])
+def create_user():
+    """
+    This route will allow to create a user.
+    """
+    user_name = request.form.get('name')
+    if user_name:
+        data_manager.create_user(user_name)
+
+    return redirect(url_for('index'))
+
 
 @app.route('/users',methods=['GET'])
 def list_users():
@@ -27,19 +41,14 @@ def list_users():
     return str(users)  # Temporarily returning users as a string
 
 
-@app.route('/users', methods=['POST'])
-def add_user():
-    """
-    This route will allow to add a user.
-    """
-    return render_template("add_user.html")
+
 
 @app.route('/users/<int:user_id>/movies', methods=['GET'])
-def show_favorites_of_user(user_id):
+def get_movies(user_id):
     """
     This route will show all favorites of a user.
     """
-    return render_template("user_favorites.html")
+    return render_template("movies.html")
 
 
 @app.route('/users/<int:user_id>/movies/<int:movie_id>/update', methods=['POST'])
@@ -58,7 +67,5 @@ def delete_movie(user_id,movie_id):
 
 
 if __name__ == '__main__':
- # with app.app_context():
-    #db.create_all()
 
   app.run()
