@@ -1,4 +1,6 @@
-from flask import Flask, render_template, request, redirect, url_for
+from flask import Flask, render_template, request, redirect, url_for, abort
+from numpy import error_message
+
 from data_manager import DataManager
 from models import db, Movie
 import os
@@ -48,7 +50,11 @@ def get_movies(user_id):
     """
     This route will show all favorites of a user.
     """
-    return render_template("movies.html")
+    user = data_manager.get_user(user_id)
+    if user:
+        movies = data_manager.get_movies(user_id)
+        return render_template('movies.html', user=user, movies = movies)
+    abort(404, description=f"There is no user by given id:{user_id}")
 
 
 @app.route('/users/<int:user_id>/movies/<int:movie_id>/update', methods=['POST'])

@@ -1,3 +1,5 @@
+from numpy import error_message
+
 from models import db, User, Movie
 
 
@@ -11,6 +13,12 @@ class DataManager:
         new_user = User(name=name)
         db.session.add(new_user)
         db.session.commit()
+
+    def get_user(self,user_id):
+        """
+        This funktion returns a user by given id.
+        """
+        return User.query.get(user_id)
 
     def get_users(self):
         """
