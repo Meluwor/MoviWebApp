@@ -65,6 +65,11 @@ def delete_movie(user_id,movie_id):
     """
     pass
 
+@app.errorhandler(404)
+def page_not_found(e):
+    return render_template('404.html'), 404
+
+
 
 if __name__ == '__main__':
 
