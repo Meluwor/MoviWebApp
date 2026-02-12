@@ -81,7 +81,13 @@ def change_movie_name(user_id,movie_id):
     """
     "This route allows users to rename any movie stored in their personal favorites."
     """
-    pass
+    user = data_manager.get_user(user_id)
+    if not user:
+        abort(404, description=f"There is no user by given id:{user_id}.")
+    new_name = request.form.get('title')
+    data_manager.update_movie(movie_id, new_name)
+    return redirect(url_for('get_movies', user_id=user_id))
+
 
 @app.route('/users/<int:user_id>/movies/<int:movie_id>/delete', methods=['POST'])
 def delete_movie(user_id,movie_id):

@@ -45,6 +45,9 @@ class DataManager:
         """
         movie = Movie.query.get(movie_id)
         if movie:
+            if movie.name == new_title:
+                #no changes so just return
+                return
             movie.name = new_title
             db.session.commit()
 
