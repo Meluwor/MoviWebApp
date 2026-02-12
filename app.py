@@ -1,5 +1,4 @@
 from flask import Flask, render_template, request, redirect, url_for, abort
-from numpy import error_message
 
 from data_manager import DataManager
 from models import db, Movie
@@ -54,7 +53,7 @@ def get_movies(user_id):
     if user:
         movies = data_manager.get_movies(user_id)
         return render_template('movies.html', user=user, movies = movies)
-    abort(404, description=f"There is no user by given id:{user_id}")
+    abort(404, description=f"There is no user by given id:{user_id}.")
 
 
 @app.route('/users/<int:user_id>/movies/<int:movie_id>/update', methods=['POST'])
@@ -79,4 +78,4 @@ def page_not_found(e):
 
 if __name__ == '__main__':
 
-  app.run()
+  app.run(host="0.0.0.0", port=5002, debug=True)

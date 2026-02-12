@@ -1,4 +1,4 @@
-from numpy import error_message
+
 
 from models import db, User, Movie
 
@@ -32,7 +32,7 @@ class DataManager:
         """
         user = User.query.get(user_id)
         if user:
-            return user.movies
+            return Movie.query.filter_by(user_id = user_id).all()
         return []
 
     def add_movie(self, movie):
