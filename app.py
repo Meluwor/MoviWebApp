@@ -3,7 +3,7 @@ from flask import Flask, render_template, request, redirect, url_for, abort
 from data_manager import DataManager
 from models import db, Movie
 import os
-
+import OMDB_api as API
 app = Flask(__name__)
 
 basedir = os.path.abspath(os.path.dirname(__file__))
@@ -52,8 +52,28 @@ def get_movies(user_id):
     user = data_manager.get_user(user_id)
     if user:
         movies = data_manager.get_movies(user_id)
-        return render_template('movies.html', user=user, movies = movies)
+        return render_template('movies.html', user_id=user_id, movies = movies)
     abort(404, description=f"There is no user by given id:{user_id}.")
+
+
+
+@app.route('/users/<int:user_id>/movies', methods=['POST'])
+def add_movie(user_id):
+    """
+    This route will allow a user to add a new movie to their personal favorites.
+    """
+    user = data_manager.get_user(user_id)
+    if not user:
+        abort(404, description=f"There is no user by given id:{user_id}.")
+
+    movie_name = request.form.get('title')
+    movie_year = request.form.get('year')
+    if movie_name:
+        movie_data = API.get_movie_by_name(movie_name, movie_year)
+        if movie_data:
+            new_movie = data_manager.convert_movie_data(user.id,movie_data)
+            data_manager.add_movie(new_movie)
+    return redirect(url_for('get_movies' , user_id=user_id))
 
 
 @app.route('/users/<int:user_id>/movies/<int:movie_id>/update', methods=['POST'])
@@ -77,5 +97,7 @@ def page_not_found(e):
 
 
 if __name__ == '__main__':
-
-  app.run(host="0.0.0.0", port=5002, debug=True)
+    #with app.app_context():
+        #db.create_all()
+    API.prepare_and_check_api()
+    app.run(host="0.0.0.0", port=5002, debug=True)
