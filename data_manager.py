@@ -47,8 +47,6 @@ class DataManager:
         if movie:
             movie.name = new_title
             db.session.commit()
-            return True
-        return False
 
     def delete_movie(self, movie_id):
         """
@@ -58,8 +56,6 @@ class DataManager:
         if movie:
             db.session.delete(movie)
             db.session.commit()
-            return True
-        return False
 
     def convert_movie_data(self,user_id, movie_data):
         """

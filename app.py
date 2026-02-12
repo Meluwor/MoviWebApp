@@ -52,7 +52,7 @@ def get_movies(user_id):
     user = data_manager.get_user(user_id)
     if user:
         movies = data_manager.get_movies(user_id)
-        return render_template('movies.html', user_id=user_id, movies = movies)
+        return render_template('movies.html', user=user, movies = movies)
     abort(404, description=f"There is no user by given id:{user_id}.")
 
 
@@ -83,12 +83,16 @@ def change_movie_name(user_id,movie_id):
     """
     pass
 
-@app.route('/users/<int:user_id>/movies/<int:movie_id>/delete', methods=['DELETE'])
+@app.route('/users/<int:user_id>/movies/<int:movie_id>/delete', methods=['POST'])
 def delete_movie(user_id,movie_id):
     """
     "This route allows users to delete any movie stored in their personal favorites."
     """
-    pass
+    user = data_manager.get_user(user_id)
+    if not user:
+        abort(404, description=f"There is no user by given id:{user_id}.")
+    data_manager.delete_movie(movie_id)
+    return redirect(url_for('get_movies', user_id=user_id))
 
 @app.errorhandler(404)
 def page_not_found(e):
