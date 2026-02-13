@@ -46,7 +46,7 @@ class DataManager:
         movie = Movie.query.get(movie_id)
         if movie:
             if movie.name == new_title:
-                #no changes so just return
+                # no changes so just return
                 return
             movie.name = new_title
             db.session.commit()
@@ -60,7 +60,7 @@ class DataManager:
             db.session.delete(movie)
             db.session.commit()
 
-    def convert_movie_data(self,user_id, movie_data):
+    def convert_movie_data(self, user_id, movie_data):
         """
         This function shall ensure to collect all the data which are needed for database.
         """
@@ -74,5 +74,17 @@ class DataManager:
         new_movie.year = movie_year
         new_movie.poster_url = movie_poster
         new_movie.director = movie_director
+        new_movie.user_id = user_id
+        return new_movie
+
+    def create_fake_movie(self, user_id, movie_name, movie_year):
+        """
+        This function will add a "fake" movie based on no data from API.
+        """
+        new_movie = Movie()
+        new_movie.name = movie_name
+        new_movie.year = movie_year
+        new_movie.poster_url = ""
+        new_movie.director = "N/A"
         new_movie.user_id = user_id
         return new_movie

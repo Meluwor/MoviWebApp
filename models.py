@@ -1,15 +1,13 @@
 from flask_sqlalchemy import SQLAlchemy
-from sqlalchemy import Column, Integer, DATE
-from sqlalchemy.dialects.mysql import VARCHAR
 
 db = SQLAlchemy()
-
 
 
 class User(db.Model):
     __tablename__ = 'users'
     id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.String(100), nullable=False)
+
 
 class Movie(db.Model):
     # Define all the Movie properties

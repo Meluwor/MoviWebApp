@@ -16,17 +16,17 @@ def prepare_and_check_api():
     """
     is_available = is_internet_available()
     if not is_available:
-        return is_available , "There is no internet!"
+        return is_available, "There is no internet!"
     is_available = is_api_available()
     if not is_available:
-        return is_available , "The API is not available at the moment!"
+        return is_available, "The API is not available at the moment!"
     key = get_api_key()
     if not key:
-        return is_available ,"There is no API-Key stored!"
+        return is_available, "There is no API-Key stored!"
     set_api_key(key)
     is_available = is_api_key_valid()
     if not is_available:
-        return is_available ,"The API-Key is not valid!"
+        return is_available, "The API-Key is not valid!"
     return is_available, "API preparation successfully"
 
 
@@ -105,7 +105,7 @@ def get_movie_by_name(movie_name, movie_year):
     params = {
         "apikey": API_KEY,
         "t": movie_name,
-        "y" :movie_year
+        "y": movie_year
     }
     try:
         response = requests.get(BASE_URL, params=params, timeout=5)
@@ -120,10 +120,12 @@ def get_movie_by_name(movie_name, movie_year):
         print(f"Network error: {e}")
         return {}
 
+
 def main():
     prepare_and_check_api()
-    movie = get_movie_by_name("matrix",1993)
+    movie = get_movie_by_name("matrix", 1993)
     print(movie)
+
 
 if __name__ == "__main__":
     main()

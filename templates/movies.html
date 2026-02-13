@@ -6,19 +6,18 @@
     <ul class="movie-list">
         {% for movie in movies %}
         <li class="movies">
-            <!--movie image -->
             <img class="movie-poster" src="{{ movie.poster_url }}" alt="No image available">
 
 
-            <!--each movie can be updated or deleted-->
             <form action="{{ url_for('change_movie_name',user_id=user.id, movie_id=movie.id)}}" method="POST">
-                <input type="text" name="title" value="{{ movie.name }}" required="">
-                <button type="submit" class="">Update</button>
+                <input type="text" name="title" value="{{ movie.name }}" required=""><br>
+                <button type="submit" class="crud_btn">Update</button><br>
 
-
+                <strong>Year:</strong>{{ movie.year }}<br>
+                <strong>Director:</strong>{{ movie.director }}<br>
             </form>
             <form action="{{ url_for('delete_movie',user_id=user.id, movie_id=movie.id)}}" method="POST">
-                <button type="submit" class=""
+                <button type="submit" class="crud_btn"
                         onclick="return confirm(&#39;Delete this movie?&#39;);">Delete
                 </button>
             </form>
@@ -36,7 +35,7 @@
 
         <input type="text" name="year" placeholder="Year (optional)">
 
-        <button type="submit" class="btn">Add Movie</button>
+        <button type="submit" class="crud_btn">Add Movie</button>
     </form>
 </div>
 
