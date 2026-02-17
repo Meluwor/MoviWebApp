@@ -67,16 +67,28 @@ def add_movie(user_id):
 
     movie_name = request.form.get('title')
     movie_year = request.form.get('year')
+
     if movie_name:
         movie_data = API.get_movie_by_name(movie_name, movie_year)
+
         if movie_data:
             new_movie = data_manager.convert_movie_data(user.id, movie_data)
-            data_manager.add_movie(new_movie)
+            stored_movie = data_manager.does_this_movie_exist(new_movie.name)
+            # this shall ensure to have no duplicates at database
+            if stored_movie:
+                print("movie exist")
+                # there is already a movie in database with this title
+                if stored_movie not in user.movies:
+                    user.movies.append(stored_movie)
+                    data_manager.link_movie_to_user()
+
+                return redirect(url_for('get_movies', user_id=user_id))
+            data_manager.add_movie(user, new_movie)
         else:
             # the demo adds all movie by name
             # it seems that is does not care about if the API has no fitting result
             new_movie = data_manager.create_fake_movie(user_id, movie_name, movie_year)
-            data_manager.add_movie(new_movie)
+            data_manager.add_movie(user, new_movie)
     return redirect(url_for('get_movies', user_id=user_id))
 
 
@@ -101,7 +113,7 @@ def delete_movie(user_id, movie_id):
     user = data_manager.get_user(user_id)
     if not user:
         abort(404, description=f"There is no user by given id:{user_id}.")
-    data_manager.delete_movie(movie_id)
+    data_manager.delete_movie(user_id, movie_id)
     return redirect(url_for('get_movies', user_id=user_id))
 
 
@@ -111,7 +123,8 @@ def page_not_found(e):
 
 
 if __name__ == '__main__':
-    # with app.app_context():
-    # db.create_all()
-    API.prepare_and_check_api()
+    #with app.app_context():
+        #db.create_all()
+    is_available,message = API.prepare_and_check_api()
+    print(f'The Api is available: {is_available}  {message}')
     app.run(host="0.0.0.0", port=5002, debug=True)

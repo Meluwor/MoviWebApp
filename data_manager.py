@@ -8,8 +8,13 @@ class DataManager:
         This function will create a user
         """
         new_user = User(name=name)
-        db.session.add(new_user)
-        db.session.commit()
+        try:
+            db.session.add(new_user)
+            db.session.commit()
+        except Exception as e:
+            db.session.rollback()
+            print(f"Error: {e}")
+
 
     def get_user(self, user_id):
         """
@@ -29,15 +34,21 @@ class DataManager:
         """
         user = User.query.get(user_id)
         if user:
-            return Movie.query.filter_by(user_id=user_id).all()
+            return user.movies
         return []
 
-    def add_movie(self, movie):
+    def add_movie(self,user, movie):
         """
         This function will add a movie to favorites.
         """
-        db.session.add(movie)
-        db.session.commit()
+        try:
+            user.movies.append(movie)
+            db.session.add(movie)
+            db.session.commit()
+        except Exception as e:
+            db.session.rollback()
+            print(f"Error: {e}")
+
 
     def update_movie(self, movie_id, new_title):
         """
@@ -48,17 +59,31 @@ class DataManager:
             if movie.name == new_title:
                 # no changes so just return
                 return
-            movie.name = new_title
-            db.session.commit()
+            try:
+                movie.name = new_title
+                db.session.commit()
+            except Exception as e:
+                db.session.rollback()
+                print(f"Error: {e}")
 
-    def delete_movie(self, movie_id):
+
+    def delete_movie(self, user_id, movie_id):
         """
         This function will delete a movie.
         """
         movie = Movie.query.get(movie_id)
-        if movie:
-            db.session.delete(movie)
-            db.session.commit()
+        user =DataManager.get_user(self,user_id)
+        if movie and user:
+            if movie in user.movies:
+                try:
+                    user.movies.remove(movie)
+                    if not movie.users:
+                        db.session.delete(movie)
+                    db.session.commit()
+                except Exception as e:
+                    db.session.rollback()
+                    print(f"Error: {e}")
+
 
     def convert_movie_data(self, user_id, movie_data):
         """
@@ -88,3 +113,19 @@ class DataManager:
         new_movie.director = "N/A"
         new_movie.user_id = user_id
         return new_movie
+
+    def does_this_movie_exist(self, movie_name):
+        """
+        This function will check if a movie name exists in database.
+        """
+        return Movie.query.filter_by(name=movie_name).first()
+
+    def link_movie_to_user(self):
+        """
+        This function shall ensure to add an existing movie to favourites
+        """
+        try:
+            db.session.commit()
+        except Exception as e:
+            db.session.rollback()
+            print(f"Error: {e}")

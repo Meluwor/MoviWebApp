@@ -27,7 +27,7 @@ def prepare_and_check_api():
     is_available = is_api_key_valid()
     if not is_available:
         return is_available, "The API-Key is not valid!"
-    return is_available, "API preparation successfully"
+    return is_available, "API preparation successfully."
 
 
 def set_api_key(key):
