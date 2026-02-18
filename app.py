@@ -38,10 +38,10 @@ def create_user():
 @app.route('/users', methods=['GET'])
 def list_users():
     """
-    This route will return a list of all users.
+    This route will just list all users.
     """
     users = data_manager.get_users()
-    return str(users)  # Temporarily returning users as a string
+    return render_template('users.html', users=users)
 
 
 @app.route('/users/<int:user_id>/movies', methods=['GET'])
@@ -76,7 +76,6 @@ def add_movie(user_id):
             stored_movie = data_manager.does_this_movie_exist(new_movie.name)
             # this shall ensure to have no duplicates at database
             if stored_movie:
-                print("movie exist")
                 # there is already a movie in database with this title
                 if stored_movie not in user.movies:
                     user.movies.append(stored_movie)
@@ -123,8 +122,8 @@ def page_not_found(e):
 
 
 if __name__ == '__main__':
-    #with app.app_context():
-        #db.create_all()
-    is_available,message = API.prepare_and_check_api()
+    # with app.app_context():
+    # db.create_all()
+    is_available, message = API.prepare_and_check_api()
     print(f'The Api is available: {is_available}  {message}')
     app.run(host="0.0.0.0", port=5002, debug=True)

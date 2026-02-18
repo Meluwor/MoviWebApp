@@ -2,14 +2,17 @@
 {% block content %}
 
 <h1>Users</h1>
-<ul class="user-list">
+<ul class="user_list">
     {% for user in users %}
-    <li class="user-entry">
-        <a href="{{ url_for('get_movies', user_id=user.id) }}" class="crud_btn">{{ user.name }}</a>
+    <li class="user_entry">
+        <strong>{{ user.name }}</strong>
+        <br>
+        <a href="{{ url_for('get_movies', user_id=user.id) }}" class="crud_btn">View Movies</a>
     </li>
     {% endfor %}
 </ul>
 <form action="{{ url_for('create_user') }}" method="POST">
+    <strong>Add New User</strong><br>
     <input type="text" name="name" placeholder="name" required>
     <button type="submit" class="crud_btn">Add</button>
 </form>

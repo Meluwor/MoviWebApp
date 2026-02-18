@@ -15,7 +15,6 @@ class DataManager:
             db.session.rollback()
             print(f"Error: {e}")
 
-
     def get_user(self, user_id):
         """
         This funktion returns a user by given id.
@@ -37,7 +36,7 @@ class DataManager:
             return user.movies
         return []
 
-    def add_movie(self,user, movie):
+    def add_movie(self, user, movie):
         """
         This function will add a movie to favorites.
         """
@@ -48,7 +47,6 @@ class DataManager:
         except Exception as e:
             db.session.rollback()
             print(f"Error: {e}")
-
 
     def update_movie(self, movie_id, new_title):
         """
@@ -66,13 +64,12 @@ class DataManager:
                 db.session.rollback()
                 print(f"Error: {e}")
 
-
     def delete_movie(self, user_id, movie_id):
         """
         This function will delete a movie.
         """
         movie = Movie.query.get(movie_id)
-        user =DataManager.get_user(self,user_id)
+        user = self.get_user(user_id)
         if movie and user:
             if movie in user.movies:
                 try:
@@ -83,7 +80,6 @@ class DataManager:
                 except Exception as e:
                     db.session.rollback()
                     print(f"Error: {e}")
-
 
     def convert_movie_data(self, user_id, movie_data):
         """

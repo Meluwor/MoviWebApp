@@ -10,6 +10,7 @@ class User(db.Model):
 
     movies = db.relationship('Movie', secondary='user_movies', backref='users')
 
+
 class Movie(db.Model):
     # Define all the Movie properties
     __tablename__ = 'movies'
@@ -23,7 +24,8 @@ class Movie(db.Model):
     user_id = db.Column(db.Integer, db.ForeignKey('users.id'), nullable=False)
 
 
+# the join table for user and movie
 user_movies = db.Table('user_movies',
-    db.Column('user_id', db.Integer, db.ForeignKey('users.id'), primary_key=True),
-    db.Column('movie_id', db.Integer, db.ForeignKey('movies.id'), primary_key=True)
-)
+                       db.Column('user_id', db.Integer, db.ForeignKey('users.id'), primary_key=True),
+                       db.Column('movie_id', db.Integer, db.ForeignKey('movies.id'), primary_key=True)
+                       )
