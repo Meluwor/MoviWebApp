@@ -1,6 +1,6 @@
 import os
 
-from flask import Flask, render_template, request, redirect, url_for, abort
+from flask import Flask, render_template, request, redirect, url_for, abort, flash
 
 import OMDB_api as API
 from data_manager import DataManager
@@ -77,11 +77,12 @@ def add_movie(user_id):
             # this shall ensure to have no duplicates at database
             if stored_movie:
                 # there is already a movie in database with this title
-                if stored_movie not in user.movies:
-                    user.movies.append(stored_movie)
-                    data_manager.link_movie_to_user()
-
+                # checking if the user already has this movie in his favourites
+                existing_link = next((movie for movie in user.movie_links if movie.movie_id == stored_movie.id), None)
+                if not existing_link:
+                    data_manager.link_movie_to_user(user,stored_movie)
                 return redirect(url_for('get_movies', user_id=user_id))
+
             data_manager.add_movie(user, new_movie)
         else:
             # the demo adds all movie by name
@@ -100,7 +101,7 @@ def change_movie_name(user_id, movie_id):
     if not user:
         abort(404, description=f"There is no user by given id:{user_id}.")
     new_name = request.form.get('title')
-    data_manager.update_movie(movie_id, new_name)
+    data_manager.update_movie(user, movie_id, new_name)
     return redirect(url_for('get_movies', user_id=user_id))
 
 
@@ -117,9 +118,8 @@ def delete_movie(user_id, movie_id):
 
 
 @app.errorhandler(404)
-def page_not_found(e):
-    return render_template('404.html'), 404
-
+def page_not_found(info):
+    return render_template('404.html', message=info.description), 404
 
 if __name__ == '__main__':
     # with app.app_context():

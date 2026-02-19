@@ -8,11 +8,9 @@ class User(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.String(100), nullable=False)
 
-    movies = db.relationship('Movie', secondary='user_movies', backref='users')
-
+    movie_links = db.relationship('UserMovie', back_populates='user')
 
 class Movie(db.Model):
-    # Define all the Movie properties
     __tablename__ = 'movies'
     id = db.Column(db.Integer, primary_key=True, autoincrement=True)
     name = db.Column(db.String(100))
@@ -20,12 +18,25 @@ class Movie(db.Model):
     year = db.Column(db.Integer)
     poster_url = db.Column(db.Text)
 
-    # Link Movie to User
+    # Link Movie to User  in this case it is the creator of the database entry
     user_id = db.Column(db.Integer, db.ForeignKey('users.id'), nullable=False)
 
-
+    user_links = db.relationship('UserMovie', back_populates='movie')
+"""
 # the join table for user and movie
 user_movies = db.Table('user_movies',
                        db.Column('user_id', db.Integer, db.ForeignKey('users.id'), primary_key=True),
                        db.Column('movie_id', db.Integer, db.ForeignKey('movies.id'), primary_key=True)
                        )
+"""
+# the join table for user and movie
+class UserMovie(db.Model):
+    __tablename__ = 'user_movies'
+    user_id = db.Column(db.Integer, db.ForeignKey('users.id'), primary_key=True)
+    movie_id = db.Column(db.Integer, db.ForeignKey('movies.id'), primary_key=True)
+
+    #this movie name could be the original or a user defined one
+    custom_movie_name = db.Column(db.String(100))
+
+    user = db.relationship('User', back_populates='movie_links')
+    movie = db.relationship('Movie', back_populates='user_links')

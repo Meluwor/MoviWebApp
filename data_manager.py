@@ -1,4 +1,4 @@
-from models import db, User, Movie
+from models import db, User, Movie, UserMovie
 
 
 class DataManager:
@@ -33,7 +33,7 @@ class DataManager:
         """
         user = User.query.get(user_id)
         if user:
-            return user.movies
+            return user.movie_links
         return []
 
     def add_movie(self, user, movie):
@@ -41,45 +41,54 @@ class DataManager:
         This function will add a movie to favorites.
         """
         try:
-            user.movies.append(movie)
             db.session.add(movie)
+            db.session.flush() #this generates the movie_id
+    
+            # link movie to user
+            new_link = UserMovie(user=user, movie=movie, custom_movie_name=movie.name)
+            db.session.add(new_link)
             db.session.commit()
         except Exception as e:
             db.session.rollback()
             print(f"Error: {e}")
 
-    def update_movie(self, movie_id, new_title):
+    def update_movie(self,user, movie_id, new_title):
         """
         This function will update the name of a movie.
         """
         movie = Movie.query.get(movie_id)
-        if movie:
-            if movie.name == new_title:
+        link = UserMovie.query.filter_by(user_id=user.id, movie_id=movie_id).first()
+        if link:
+            if link.custom_movie_name == new_title:
                 # no changes so just return
                 return
             try:
-                movie.name = new_title
+                link.custom_movie_name = new_title
                 db.session.commit()
             except Exception as e:
                 db.session.rollback()
-                print(f"Error: {e}")
+                print(f"Error while updating movie name. {e}")
+
 
     def delete_movie(self, user_id, movie_id):
         """
         This function will delete a movie.
         """
-        movie = Movie.query.get(movie_id)
-        user = self.get_user(user_id)
-        if movie and user:
-            if movie in user.movies:
-                try:
-                    user.movies.remove(movie)
-                    if not movie.users:
-                        db.session.delete(movie)
-                    db.session.commit()
-                except Exception as e:
-                    db.session.rollback()
-                    print(f"Error: {e}")
+        link = UserMovie.query.filter_by(user_id=user_id, movie_id=movie_id).first()
+        if link:
+            try:
+                movie = link.movie
+                db.session.delete(link)
+
+                db.session.flush()# is needed to be able to do propper check
+                if not movie.user_links:
+                    #no user uses this movie anymore
+                    db.session.delete(movie)
+                    print(f"Movie '{movie.name}' has been deleted from database.")
+                db.session.commit()
+            except Exception as e:
+                db.session.rollback()
+                print(f"Error while deleting movie:{e}")
 
     def convert_movie_data(self, user_id, movie_data):
         """
@@ -116,11 +125,13 @@ class DataManager:
         """
         return Movie.query.filter_by(name=movie_name).first()
 
-    def link_movie_to_user(self):
+    def link_movie_to_user(self,user,movie):
         """
         This function shall ensure to add an existing movie to favourites
         """
+        new_link = UserMovie(user=user, movie=movie, custom_movie_name=movie.name)
         try:
+            db.session.add(new_link)
             db.session.commit()
         except Exception as e:
             db.session.rollback()
