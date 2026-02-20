@@ -22,6 +22,7 @@ def prepare_and_check_api():
         return is_available, "The API is not available at the moment!"
     key = get_api_key()
     if not key:
+        is_available = False
         return is_available, "There is no API-Key stored!"
     set_api_key(key)
     is_available = is_api_key_valid()
