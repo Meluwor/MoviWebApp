@@ -7,6 +7,22 @@
 
 </HEAD>
 <BODY>
+<!-- FLASH MESSAGES START -->
+{% with messages = get_flashed_messages(with_categories=true) %}
+{% if messages %}
+<div style="margin: 20px 0;">
+    {% for category, message in messages %}
+    <div style="padding: 15px; margin-bottom: 10px; border-radius: 5px;
+                    background-color: {{ 'lightblue' if category == 'info' else '#d4edda' if category == 'success' else '#f8d7da' }};
+                    color: {{ 'black' if category == 'info' else '#155724' if category == 'success' else '#721c24' }};
+                    border: 1px solid transparent;">
+        {{ message }}
+    </div>
+    {% endfor %}
+</div>
+{% endif %}
+{% endwith %}
+<!-- FLASH MESSAGES ENDE -->
 <nav>
     <div class="banner">
         <a href="{{ url_for('index') }}" class="logo">🎬 MovieApp</a>

@@ -10,6 +10,7 @@ class User(db.Model):
 
     movie_links = db.relationship('UserMovie', back_populates='user')
 
+
 class Movie(db.Model):
     __tablename__ = 'movies'
     id = db.Column(db.Integer, primary_key=True, autoincrement=True)
@@ -22,20 +23,14 @@ class Movie(db.Model):
     user_id = db.Column(db.Integer, db.ForeignKey('users.id'), nullable=False)
 
     user_links = db.relationship('UserMovie', back_populates='movie')
-"""
-# the join table for user and movie
-user_movies = db.Table('user_movies',
-                       db.Column('user_id', db.Integer, db.ForeignKey('users.id'), primary_key=True),
-                       db.Column('movie_id', db.Integer, db.ForeignKey('movies.id'), primary_key=True)
-                       )
-"""
+
 # the join table for user and movie
 class UserMovie(db.Model):
     __tablename__ = 'user_movies'
     user_id = db.Column(db.Integer, db.ForeignKey('users.id'), primary_key=True)
     movie_id = db.Column(db.Integer, db.ForeignKey('movies.id'), primary_key=True)
 
-    #this movie name could be the original or a user defined one
+    # this movie name could be the original or a user defined one
     custom_movie_name = db.Column(db.String(100))
 
     user = db.relationship('User', back_populates='movie_links')

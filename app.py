@@ -8,6 +8,9 @@ from models import db
 
 app = Flask(__name__)
 
+# Some key is needed to activate flash
+app.secret_key = os.getenv('FLASH_KEY')
+
 basedir = os.path.abspath(os.path.dirname(__file__))
 app.config['SQLALCHEMY_DATABASE_URI'] = f"sqlite:///{os.path.join(basedir, 'data/movies.db')}"
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
@@ -31,7 +34,7 @@ def create_user():
     user_name = request.form.get('name')
     if user_name:
         data_manager.create_user(user_name)
-
+        flash(f'New user: {user_name} created.', 'success')
     return redirect(url_for('index'))
 
 
@@ -80,15 +83,20 @@ def add_movie(user_id):
                 # checking if the user already has this movie in his favourites
                 existing_link = next((movie for movie in user.movie_links if movie.movie_id == stored_movie.id), None)
                 if not existing_link:
-                    data_manager.link_movie_to_user(user,stored_movie)
+                    data_manager.link_movie_to_user(user, stored_movie)
+                    flash(f'Added new movie to favourites.', 'info')
+                else:
+                    flash(f'You already have this movie in your favourites.', 'info')
                 return redirect(url_for('get_movies', user_id=user_id))
 
             data_manager.add_movie(user, new_movie)
+            flash(f'Added new movie to favourites.', 'info')
         else:
             # the demo adds all movie by name
             # it seems that is does not care about if the API has no fitting result
             new_movie = data_manager.create_fake_movie(user_id, movie_name, movie_year)
             data_manager.add_movie(user, new_movie)
+            flash(f'Added new movie to favourites.', 'info')
     return redirect(url_for('get_movies', user_id=user_id))
 
 
@@ -102,6 +110,7 @@ def change_movie_name(user_id, movie_id):
         abort(404, description=f"There is no user by given id:{user_id}.")
     new_name = request.form.get('title')
     data_manager.update_movie(user, movie_id, new_name)
+    flash(f'Updated movie.', 'info')
     return redirect(url_for('get_movies', user_id=user_id))
 
 
@@ -114,12 +123,14 @@ def delete_movie(user_id, movie_id):
     if not user:
         abort(404, description=f"There is no user by given id:{user_id}.")
     data_manager.delete_movie(user_id, movie_id)
+    flash(f'Removed movie from favourites.', 'info')
     return redirect(url_for('get_movies', user_id=user_id))
 
 
 @app.errorhandler(404)
 def page_not_found(info):
     return render_template('404.html', message=info.description), 404
+
 
 if __name__ == '__main__':
     # with app.app_context():

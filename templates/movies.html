@@ -6,7 +6,11 @@
     <ul class="movie_list">
         {% for link in movies %}
         <li class="movies">
-            <img class="movie_poster" src="{{ link.movie.poster_url }}" alt="No image available">
+            {% if link.movie.poster_url and link.movie.poster_url != 'N/A' %}
+            <img class="movie_poster" src="{{ link.movie.poster_url }}" alt="Poster for {{ link.custom_movie_name }}">
+            {% else %}
+            <div class="movie_poster_placeholder">🎬 No Image</div>
+            {% endif %}
 
 
             <form action="{{ url_for('change_movie_name',user_id=user.id, movie_id=link.movie.id)}}" method="POST">

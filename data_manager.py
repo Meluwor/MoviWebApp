@@ -42,8 +42,8 @@ class DataManager:
         """
         try:
             db.session.add(movie)
-            db.session.flush() #this generates the movie_id
-    
+            db.session.flush()  # this generates the movie_id
+
             # link movie to user
             new_link = UserMovie(user=user, movie=movie, custom_movie_name=movie.name)
             db.session.add(new_link)
@@ -52,7 +52,7 @@ class DataManager:
             db.session.rollback()
             print(f"Error: {e}")
 
-    def update_movie(self,user, movie_id, new_title):
+    def update_movie(self, user, movie_id, new_title):
         """
         This function will update the name of a movie.
         """
@@ -69,7 +69,6 @@ class DataManager:
                 db.session.rollback()
                 print(f"Error while updating movie name. {e}")
 
-
     def delete_movie(self, user_id, movie_id):
         """
         This function will delete a movie.
@@ -80,9 +79,9 @@ class DataManager:
                 movie = link.movie
                 db.session.delete(link)
 
-                db.session.flush()# is needed to be able to do propper check
+                db.session.flush()  # is needed to be able to do propper check
                 if not movie.user_links:
-                    #no user uses this movie anymore
+                    # no user uses this movie anymore
                     db.session.delete(movie)
                     print(f"Movie '{movie.name}' has been deleted from database.")
                 db.session.commit()
@@ -125,7 +124,7 @@ class DataManager:
         """
         return Movie.query.filter_by(name=movie_name).first()
 
-    def link_movie_to_user(self,user,movie):
+    def link_movie_to_user(self, user, movie):
         """
         This function shall ensure to add an existing movie to favourites
         """
